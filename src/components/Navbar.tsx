@@ -27,9 +27,6 @@ const navItems = [
     return (
       <>
         <div
-          className={`sticky top-0 z-50 bg-white dark:bg-zinc-900 transition-shadow ${
-            isScrolled ? "shadow-md" : ""
-          }`}
         >
           <NavigationMenu>
             <NavigationMenuList className="flex gap-10 text-2xl hover:cursor-pointer">

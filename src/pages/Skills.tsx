@@ -21,7 +21,7 @@ const Skills = () => {
   ];
 
   return (
-    <div>
+    <div className="my-20">
       <h2 className="text-3xl font-bold text-center pt-20 ">Tech Stack</h2>
       <section className="flex justify-center m-auto py-10">
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-7">
