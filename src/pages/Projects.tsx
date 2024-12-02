@@ -8,7 +8,7 @@ const Projects = () => {
     return (
       <>
         <header className='flex flex-col justify-center text-center align-middle mb-10'>
-          <h1 className='text-4xl mt-10 font-semibold'>Featured Projects</h1>
+          <h1 className='text-4xl mt-20 font-semibold'>Featured Projects</h1>
           <p className='mt-2 text-lg text-gray-400'>Hover for more info</p>
         </header>
 
