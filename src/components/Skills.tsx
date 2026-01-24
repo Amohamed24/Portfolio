@@ -78,7 +78,7 @@ function SkillCategoryCard({
       className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm hover:shadow-md hover:border-accent/30 transition-all duration-300"
     >
       <h3 className="text-lg font-bold text-foreground mb-4 flex items-center gap-3">
-        <div className="w-10 h-10 rounded-lg bg-[#DBEAFE] flex items-center justify-center">
+        <div className="w-10 h-10 rounded-lg bg-accent/20 flex items-center justify-center">
           <Icon className="w-5 h-5 text-accent" />
         </div>
         {category.name}
@@ -97,7 +97,7 @@ export default function Skills() {
   const isInView = useInView(ref, { once: true, margin: '-100px' });
 
   return (
-    <section id="skills" className="py-24 px-6">
+    <section id="skills" className="py-24 px-6 bg-white">
       <div className="max-w-6xl mx-auto">
         <motion.div
           ref={ref}

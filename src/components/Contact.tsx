@@ -1,9 +1,15 @@
 'use client';
 
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useInView } from 'framer-motion';
 import { useRef } from 'react';
-import { Github, Linkedin, Mail, Send, Clock } from 'lucide-react';
+import { Github, Linkedin, Mail, Clock, Loader2 } from 'lucide-react';
+import { toast } from 'sonner';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
 
 interface SocialLink {
   name: string;
@@ -32,9 +38,44 @@ const socialLinks: SocialLink[] = [
 export default function Contact() {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: '-100px' });
+  const [isLoading, setIsLoading] = useState(false);
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    message: '',
+  });
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+
+    try {
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to send message');
+      }
+
+      toast.success('Message sent!', {
+        description: "Thanks for reaching out. I'll get back to you soon.",
+      });
+
+      setFormData({ name: '', email: '', message: '' });
+    } catch (error) {
+      toast.error('Something went wrong', {
+        description: 'Please try again or email me directly.',
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
-    <section id="contact" className="py-24 px-6 bg-gray-50/50">
+    <section id="contact" className="py-24 px-6 bg-[#0F172A]">
       <div className="max-w-4xl mx-auto">
         <motion.div
           ref={ref}
@@ -43,10 +84,10 @@ export default function Contact() {
           transition={{ duration: 0.6 }}
           className="text-center mb-12"
         >
-          <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
+          <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">
             Get In Touch
           </h2>
-          <p className="text-foreground/60 max-w-xl mx-auto">
+          <p className="text-gray-400 max-w-xl mx-auto">
             I&apos;m always open to discussing new opportunities, interesting
             projects, or just having a chat about technology.
           </p>
@@ -59,13 +100,13 @@ export default function Contact() {
           transition={{ duration: 0.6, delay: 0.1 }}
           className="flex justify-center mb-8"
         >
-          <div className="bg-white rounded-xl px-6 py-4 shadow-sm border border-gray-100 flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-[#DBEAFE] flex items-center justify-center">
+          <div className="bg-white/5 backdrop-blur-sm rounded-xl px-6 py-4 border border-white/10 flex items-center gap-3">
+            <div className="w-10 h-10 rounded-lg bg-accent/20 flex items-center justify-center">
               <Clock className="w-5 h-5 text-accent" />
             </div>
             <div>
-              <p className="font-bold text-foreground">Quick Response</p>
-              <p className="text-sm text-foreground/60">I typically respond within 24 hours</p>
+              <p className="font-bold text-white">Quick Response</p>
+              <p className="text-sm text-gray-400">I typically respond within 24 hours</p>
             </div>
           </div>
         </motion.div>
@@ -75,66 +116,70 @@ export default function Contact() {
           initial={{ opacity: 0, y: 30 }}
           animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
           transition={{ duration: 0.6, delay: 0.2 }}
-          className="bg-white rounded-2xl p-8 shadow-lg shadow-gray-200/50 border border-gray-100 mb-12"
+          className="bg-white/5 backdrop-blur-sm rounded-2xl p-8 border border-white/10 mb-12"
         >
-          <h3 className="text-2xl font-bold text-foreground mb-6">
+          <h3 className="text-2xl font-bold text-white mb-6">
             Send a Message
           </h3>
-          <form className="space-y-6">
-            <div>
-              <label
-                htmlFor="name"
-                className="block text-sm font-medium text-foreground/80 mb-2"
-              >
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="space-y-2">
+              <Label htmlFor="name" className="text-sm font-medium text-gray-300">
                 Name
-              </label>
-              <input
-                type="text"
+              </Label>
+              <Input
                 id="name"
-                name="name"
-                placeholder="Your Name"
-                className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-accent focus:ring-2 focus:ring-accent/20 outline-none transition-all duration-200 text-foreground placeholder:text-foreground/40"
+                value={formData.name}
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                placeholder="Your name"
+                required
+                disabled={isLoading}
+                className="bg-white/5 border-white/10 text-white placeholder:text-gray-500 focus:border-accent focus:ring-accent/20"
               />
             </div>
-            <div>
-              <label
-                htmlFor="email"
-                className="block text-sm font-medium text-foreground/80 mb-2"
-              >
+            <div className="space-y-2">
+              <Label htmlFor="email" className="text-sm font-medium text-gray-300">
                 Email
-              </label>
-              <input
-                type="email"
+              </Label>
+              <Input
                 id="email"
-                name="email"
+                type="email"
+                value={formData.email}
+                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                 placeholder="your@email.com"
-                className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-accent focus:ring-2 focus:ring-accent/20 outline-none transition-all duration-200 text-foreground placeholder:text-foreground/40"
+                required
+                disabled={isLoading}
+                className="bg-white/5 border-white/10 text-white placeholder:text-gray-500 focus:border-accent focus:ring-accent/20"
               />
             </div>
-            <div>
-              <label
-                htmlFor="message"
-                className="block text-sm font-medium text-foreground/80 mb-2"
-              >
+            <div className="space-y-2">
+              <Label htmlFor="message" className="text-sm font-medium text-gray-300">
                 Message
-              </label>
-              <textarea
+              </Label>
+              <Textarea
                 id="message"
-                name="message"
+                value={formData.message}
+                onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+                placeholder="Tell me about your project..."
                 rows={5}
-                placeholder="Your message..."
-                className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-accent focus:ring-2 focus:ring-accent/20 outline-none transition-all duration-200 text-foreground placeholder:text-foreground/40 resize-none"
+                required
+                disabled={isLoading}
+                className="bg-white/5 border-white/10 text-white placeholder:text-gray-500 focus:border-accent focus:ring-accent/20 resize-none"
               />
             </div>
-            <motion.button
+            <Button
               type="submit"
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              className="w-full bg-accent hover:bg-accent-dark text-white font-medium py-3 px-6 rounded-lg flex items-center justify-center gap-2 transition-colors duration-200"
+              disabled={isLoading}
+              className="w-full bg-accent hover:bg-accent-dark text-white"
             >
-              Send Message
-              <Send className="w-4 h-4" />
-            </motion.button>
+              {isLoading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Sending...
+                </>
+              ) : (
+                'Send Message'
+              )}
+            </Button>
           </form>
         </motion.div>
 
@@ -160,12 +205,12 @@ export default function Contact() {
               transition={{ duration: 0.4, delay: 0.5 + index * 0.1 }}
               whileHover={{ scale: 1.1, y: -2 }}
               whileTap={{ scale: 0.95 }}
-              className="group flex flex-col items-center gap-2 p-4 rounded-xl hover:bg-white hover:shadow-lg hover:shadow-accent/10 transition-all duration-300"
+              className="group flex flex-col items-center gap-2 p-4 rounded-xl hover:bg-white/5 transition-all duration-300"
             >
-              <div className="text-foreground/70 group-hover:text-accent-dark transition-colors duration-200">
+              <div className="text-gray-400 group-hover:text-accent transition-colors duration-200">
                 {link.icon}
               </div>
-              <span className="text-sm font-medium text-foreground/60 group-hover:text-foreground/80 transition-colors duration-200">
+              <span className="text-sm font-medium text-gray-500 group-hover:text-gray-300 transition-colors duration-200">
                 {link.name}
               </span>
             </motion.a>
@@ -181,8 +226,8 @@ export default function Contact() {
         transition={{ duration: 0.6, delay: 0.8 }}
         className="mt-16"
       >
-        <div className="border-t border-gray-200 w-full" />
-        <p className="text-sm text-foreground/40 text-center pt-8 pb-1">
+        <div className="border-t border-white/10 w-full" />
+        <p className="text-sm text-gray-500 text-center pt-8 pb-1">
           © 2025 Mohamed Ahmed. Built with Next.js, TypeScript, and Tailwind CSS
         </p>
       </motion.div>
